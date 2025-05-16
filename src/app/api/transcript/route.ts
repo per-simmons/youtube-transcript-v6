@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchTranscript } from "youtube-transcript-plus";
 
-export const runtime = "edge";
+// Set explicit runtime to Node.js instead of Edge
+export const runtime = "nodejs";
 
 // The library returns this structure
 type TranscriptResponse = Array<{

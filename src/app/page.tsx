@@ -35,7 +35,7 @@ export default function Home() {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch transcript");
+        throw new Error(data.error || data.message || "Failed to fetch transcript");
       }
       
       setTranscript(data.transcript);
@@ -44,7 +44,8 @@ export default function Home() {
         transcriptRef.current.scrollTop = 0;
       }
     } catch (err: any) {
-      setError(err.message || "An error occurred while fetching the transcript");
+      console.error("Error:", err);
+      setError(err.message || "An error occurred while fetching the transcript. Please check the URL and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -59,6 +60,20 @@ export default function Home() {
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy transcript:", err);
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement("textarea");
+      textArea.value = transcript;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch (e) {
+        console.error("Fallback copy failed:", e);
+      }
+      document.body.removeChild(textArea);
     }
   };
   
